@@ -29,3 +29,6 @@ test = [
 [project.urls]
 Homepage = "https://github.com/adamhadani/prettyalgo"
 Issues = "https://github.com/adamhadani/prettyalgo/issues"
+
+[tool.isort]
+profile = "black"

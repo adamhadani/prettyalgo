@@ -42,7 +42,7 @@ class PrettyListPrinter:
         self.using_context = False
         return
 
-    def pformat(self, lst: List, ptrs=None):
+    def pformat(self, lst: List, ptrs=None, context=None):
         if not lst:
             return "<Empty List>"
 
@@ -74,10 +74,15 @@ class PrettyListPrinter:
                         cell_border_pos[value] + cell_border_pos[value + 1]
                     ) // 2
                     fries.append(" " * display_pos + f"^ {name}={value}")
-
         fries = NEW_LINE.join(fries) + NEW_LINE
 
-        return sando + fries
+        soda = []
+        if context:
+            for name, value in context.items():
+                soda.append(f"{name} = {value}")
+        soda = NEW_LINE.join(soda) + NEW_LINE
+
+        return sando + fries + soda
 
     def pprint(self, lst: List, fp=None, *args, **kwargs):
         fp = fp if fp else sys.stdout

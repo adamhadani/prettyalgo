@@ -16,7 +16,7 @@ def main():
         i, j = 1, 1
         count = 1
         while i < len(nums):
-            pprint.pp(nums, ptrs=dict(i=i, j=j))
+            pprint.pp(nums, ptrs=dict(i=i, j=j), context=dict(count=count))
             if nums[i] == nums[i - 1]:
                 count += 1
                 if count > 2:

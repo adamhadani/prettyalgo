@@ -6,8 +6,13 @@ import sys
 from time import sleep
 from typing import List
 
+from termcolor import colored
+
 NEW_LINE = "\n"
+H_SEP = "-"
 V_SEP = "|"
+EDGE_CHAR = "+"
+EMPTY_STR = "<Empty List>"
 
 
 def build_vpad(s):
@@ -19,7 +24,19 @@ def build_vpad(s):
 
 
 class PrettyListPrinter:
-    def __init__(self, padding=1, v_padding=0, animate=True, animate_fps=1):
+    def __init__(
+        self,
+        padding=1,
+        v_padding=0,
+        h_sep=H_SEP,
+        v_sep=V_SEP,
+        edge_char=EDGE_CHAR,
+        caption=None,
+        animate=False,
+        animate_fps=1,
+        clear=True,
+        interactive=False,
+    ):
         """A pretty printer for list objects useful in particular for visualizing algorithms involving
         iteration over lists with one or more pointers.
 
@@ -28,8 +45,14 @@ class PrettyListPrinter:
         """
         self.padding = padding
         self.v_padding = v_padding
+        self.h_sep = h_sep
+        self.v_sep = v_sep
+        self.edge_char = edge_char
+        self.caption = caption
         self.animate = animate
         self.animate_fps = animate_fps
+        self.clear = clear
+        self.interactive = interactive
 
         # used to track state as a context manager
         self.using_context = False
@@ -40,60 +63,122 @@ class PrettyListPrinter:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.using_context = False
-        return
 
-    def pformat(self, lst: List, ptrs=None, context=None):
+    def pformat(self, lst: List, ptrs=None, context=None) -> str:
+        """Return a formatted string representation of the given list,
+        along with given optional parameters such as pointers into
+        positions in list and variables used to hold various contextual
+        information we wish to display in tandem.
+
+        Args:
+            lst (List): list
+            ptrs (dict, optional): dictionary of pointers giving their display name and value. Defaults to None.
+            context (dict, optional): dictionary of context variables giving their display name and value. Defaults to None.
+
+        Returns:
+            str: formatted string
+
+        """
         if not lst:
-            return "<Empty List>"
+            return EMPTY_STR
 
+        # our formatted string is made out of three separable parts:
+        # - the main list itself ("the sandwich")
+        # - the (optional) pointers display ("the fries").
+        #   These need to know a bit more about the sandwich innards, hence "the ham".
+        # - the (optional) contextual variables display ("the soda")
+        tray = self._tray(lst)
+        sando, ham = self._sando(lst)
+        fries = self._fries(lst, ham, ptrs=ptrs)
+        soda = self._soda(lst, ptrs=ptrs, context=context)
+
+        return tray + soda + sando + fries
+
+    def pprint(self, lst: List, fp=None, *args, **kwargs):
+        fp = fp if fp else sys.stdout
+        if self.animate:
+            sleep(1 / self.animate_fps)
+        if self.clear:
+            os.system("clear")
+
+        fp.write(self.pformat(lst, *args, **kwargs))
+
+        if self.interactive:
+            input(NEW_LINE + "Press Enter to continue...")
+
+    # alias for pprint
+    pp = pprint
+
+    def _tray(self, lst):
+        tray = []
+        if self.caption:
+            tray.append(self.caption)
+            tray.append(self.h_sep * len(self.caption))
+
+        tray_str = NEW_LINE.join(tray) + NEW_LINE
+
+        return tray_str
+
+    def _sando(self, lst):
         pad = " " * self.padding
         ham = (
-            f"{V_SEP}{pad}" + f"{pad}|{pad}".join(str(x) for x in lst) + f"{pad}{V_SEP}"
+            f"{self.v_sep}{pad}"
+            + f"{pad}|{pad}".join(str(x) for x in lst)
+            + f"{pad}{self.v_sep}"
         )
-        bun = "-" * len(ham)
+        cheese = (
+            NEW_LINE.join((build_vpad(ham) for i in range(self.v_padding)))
+            if self.v_padding
+            else None
+        )
+        bun = self.edge_char + self.h_sep * (len(ham) - 2) + self.edge_char
 
-        if self.v_padding > 0:
-            vpad = NEW_LINE.join((build_vpad(ham) for i in range(self.v_padding)))
-            ham = NEW_LINE.join((vpad, ham, vpad))
+        sando = [bun, cheese, ham, cheese, bun]
+        sando_str = NEW_LINE + NEW_LINE.join(elem for elem in sando if elem) + NEW_LINE
 
-        sando = NEW_LINE + NEW_LINE.join((bun, ham, bun)) + NEW_LINE
+        return sando_str, ham
 
-        fries = []
+    def _fries(self, lst, ham, ptrs):
+        fries, fries_str = [], ""
         if ptrs:
             # given some pointers to list to display
             cell_border_pos = [pos for pos, char in enumerate(ham) if char == V_SEP]
 
             for name, value in ptrs.items():
-                if value < 0 or value > len(lst) - 1:
-                    # Out of bounds
+                if value < 0:
+                    # Out of bounds to the left
+                    fries.append(f"^ {name}={value} " + colored("(OOB)", "red"))
+                elif value > len(lst) - 1:
+                    # Out of bounds to the right
                     fries.append(
-                        f"{name} = {value} is out of bounds! (0 <= N <= {len(lst)=})"
+                        (" " * len(ham))
+                        + f"^ {name}={value} "
+                        + colored("(OOB)", "red")
                     )
                 else:
                     display_pos = (
                         cell_border_pos[value] + cell_border_pos[value + 1]
                     ) // 2
                     fries.append(" " * display_pos + f"^ {name}={value}")
-        fries = NEW_LINE.join(fries) + NEW_LINE
 
+        fries_str = NEW_LINE.join(fries) + NEW_LINE
+
+        return fries_str
+
+    def _soda(self, lst, ptrs=None, context=None):
         soda = []
+
+        soda.append(f"{'len(lst):':<12}{len(lst):>8}")
+        if ptrs:
+            for name, value in ptrs.items():
+                soda.append(f"{name:<12}{value:>8}")
         if context:
             for name, value in context.items():
-                soda.append(f"{name} = {value}")
-        soda = NEW_LINE.join(soda) + NEW_LINE
+                soda.append(f"{name:<12}{value:>8}")
 
-        return sando + fries + soda
+        soda_str = NEW_LINE.join(elem for elem in soda if elem) + NEW_LINE
 
-    def pprint(self, lst: List, fp=None, *args, **kwargs):
-        fp = fp if fp else sys.stdout
-        if self.using_context:
-            if self.animate:
-                sleep(1 / self.animate_fps)
-                os.system("clear")
-        fp.write(self.pformat(lst, *args, **kwargs))
-
-    # alias for pprint
-    pp = pprint
+        return soda_str
 
 
 class PrettyList(list):

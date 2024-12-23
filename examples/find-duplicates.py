@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 """
-Example of using the library with a duplicate finding algorithm
+Example of using the library interactively on the terminal.
+
+For this example we're using a duplicate finding algorithm from leetcode:
+
+    https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
+
 """
 
 import sys
@@ -9,10 +14,17 @@ from prettyalgo.pprint import PrettyListPrinter
 
 
 def main():
-    # some common print parameters we can tweak
+    # our input
     nums = [0, 0, 1, 1, 1, 1, 2, 3, 3]
 
-    with PrettyListPrinter(padding=4, v_padding=1) as pprint:
+    # here we use the context manager interface
+    with PrettyListPrinter(
+        padding=4,
+        v_padding=1,
+        caption="Remove Duplicates From Sorted Array 2",
+        interactive=True,
+    ) as pprint:
+        # inside is the actual algorithm, and we are free to use pprint.pp calls inside as needed
         i, j = 1, 1
         count = 1
         while i < len(nums):
@@ -29,7 +41,7 @@ def main():
             j += 1
             i += 1
 
-        pprint.pp(nums, ptrs=dict(i=i, j=j))
+        pprint.pp(nums, ptrs=dict(i=i, j=j), context=dict(count=count))
 
 
 if __name__ == "__main__":

@@ -38,3 +38,10 @@ def test_pformat_basic_str():
     pprint = PrettyListPrinter()
 
     assert isinstance(pprint.pformat(lst), str)
+
+
+def test_pformat_with_formatting_options():
+    lst = [0, 1, 1, 3]
+    pprint = PrettyListPrinter(padding=2, v_padding=1, caption="Formatted")
+
+    assert isinstance(pprint.pformat(lst), str)

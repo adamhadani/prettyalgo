@@ -6,7 +6,7 @@ Highlights:
 
 * Pretty print data structures and algorithms, especially sequence-oriented ones involving arrays such as lists, tuples and strs, and iterations, in the vein of leetcode and similar programming puzzles.
 * Extensive configurability for various display styles and usage modes, such as console-interactive, animated, and more.
-# Extensive use of [pre-commit](https://https://pre-commit.com/) hooks and unit-tests coverage to ensure correct functionality. Programming puzzles are hard enough to solve and debug, we shouldn't make it more error-prone by trying to use this library!
+* Extensive use of [pre-commit](https://https://pre-commit.com/) hooks and unit-tests coverage to ensure correct functionality. Programming puzzles are hard enough to solve and debug, we shouldn't make it more error-prone by trying to use this library!
 
 
 ## Getting Started

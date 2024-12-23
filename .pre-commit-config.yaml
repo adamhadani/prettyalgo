@@ -36,7 +36,7 @@ repos:
     files: '^\.circleci/config.yml$'
   - id: pytest
     name: pytest [with coverage, without slow]
-    entry: bash -ec "pytest --cov=prettyalgo prettyalgo/tests --cov-fail-under='50' -m 'not slow'"
+    entry: bash -ec "pytest --cov=prettyalgo prettyalgo/tests --cov-fail-under='90' -m 'not slow'"
     language: system
     types: [python]
     pass_filenames: false

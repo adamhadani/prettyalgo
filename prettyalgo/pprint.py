@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+from collections.abc import Sequence
 from time import sleep
 from typing import List
 
@@ -81,6 +82,8 @@ class PrettyListPrinter:
         """
         if not lst:
             return EMPTY_STR
+        if not isinstance(lst, Sequence):
+            raise TypeError(f"input must be a sequence type. Got: {type(lst)=}")
 
         # our formatted string is made out of three separable parts:
         # - some preamble, e.g. optional captioning and such ("the tray")

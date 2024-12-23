@@ -14,7 +14,7 @@ from prettyalgo.pprint import PrettyListPrinter
 
 
 def main():
-    # our input
+    # our input.
     nums = [0, 0, 1, 1, 1, 1, 2, 3, 3]
 
     # here we use the context manager interface

@@ -1,3 +1,5 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/adamhadani/prettyalgo/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/adamhadani/prettyalgo/tree/main)
+
 # :sparkles: prettyalgo
 
 Pretty print for programming puzzles.

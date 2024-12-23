@@ -28,6 +28,8 @@ def main():
         i, j = 1, 1
         count = 1
         while i < len(nums):
+            # ptrs is an optional dictionary of pointers (indexes) into the list, for display.
+            # context is an optional dictionary of auxilliary variables used, for display.
             pprint.pp(nums, ptrs=dict(i=i, j=j), context=dict(count=count))
             if nums[i] == nums[i - 1]:
                 count += 1

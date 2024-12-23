@@ -83,10 +83,11 @@ class PrettyListPrinter:
             return EMPTY_STR
 
         # our formatted string is made out of three separable parts:
+        # - some preamble, e.g. optional captioning and such ("the tray")
+        # - the variables display including optional contextual variables ("the soda")
         # - the main list itself ("the sandwich")
         # - the (optional) pointers display ("the fries").
         #   These need to know a bit more about the sandwich innards, hence "the ham".
-        # - the (optional) contextual variables display ("the soda")
         tray = self._tray(lst)
         sando, ham = self._sando(lst)
         fries = self._fries(lst, ham, ptrs=ptrs)
@@ -95,6 +96,15 @@ class PrettyListPrinter:
         return tray + soda + sando + fries
 
     def pprint(self, lst: List, fp=None, *args, **kwargs):
+        """Wrapper around `pformat()` that will print to given file pointer
+        or to sys.stdout if none is provided. All other arguments are passed
+        as is into the `pformat()` call.
+
+        Args:
+            lst (List): list
+            fp (file object, optional): file object to write to. Defaults to None which will route to sys.stdout.
+
+        """
         fp = fp if fp else sys.stdout
         if self.animate:
             sleep(1 / self.animate_fps)
@@ -110,6 +120,7 @@ class PrettyListPrinter:
     pp = pprint
 
     def _tray(self, lst):
+        """The tray is the preamble: optional captioning and such."""
         tray = []
         if self.caption:
             tray.append(self.caption)
@@ -120,6 +131,7 @@ class PrettyListPrinter:
         return tray_str
 
     def _sando(self, lst):
+        """The sandwich is the actual list display."""
         pad = " " * self.padding
         ham = (
             f"{self.v_sep}{pad}"
@@ -139,6 +151,7 @@ class PrettyListPrinter:
         return sando_str, ham
 
     def _fries(self, lst, ham, ptrs):
+        """The fries are the various pointers we display positionally with respect to the list."""
         fries, fries_str = [], ""
         if ptrs:
             # given some pointers to list to display
@@ -166,6 +179,7 @@ class PrettyListPrinter:
         return fries_str
 
     def _soda(self, lst, ptrs=None, context=None):
+        """The soda is additional meta-data e.g. contextual parameters we display alongside."""
         soda = []
 
         soda.append(f"{'len(lst):':<12}{len(lst):>8}")
